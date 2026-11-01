@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs"; 
-import dbConnect from "@/lib/mongodb"; 
+import {dbConnect} from "@/lib/mongodb"; 
 import User from "@/model/user"; 
 
 export async function POST(req) {
