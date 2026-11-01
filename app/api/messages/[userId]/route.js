@@ -2,7 +2,6 @@ import { dbConnect } from "@/lib/mongodb";
 import Message from "@/model/message";
 import { NextResponse } from "next/server";
 
-export const dynamic = "force-dynamic";
 
 export async function GET(req, { params }) {
   try {
