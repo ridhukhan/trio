@@ -1,34 +1,78 @@
-import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs"; // অথবা bcrypt
+import dbConnect from "@/lib/mongodb"; // আপনার ডাটাবেজ কানেকশন ফাইলের পাথ
+import User from "@/model/user"; // আপনার Mongoose ইউজার মডেল
 
-export async function GET(req) {
+export async function POST(req) {
   try {
-    let token = req.cookies.get("token")?.value;
+    await dbConnect();
 
-    if (!token) {
-      const authHeader = req.headers.get("authorization");
-      if (authHeader && authHeader.startsWith("Bearer ")) {
-        token = authHeader.split(" ")[1];
-      }
+    const { email, password } = await req.json();
+
+    if (!email || !password) {
+      return NextResponse.json(
+        { message: "Email and password are required" },
+        { status: 400 }
+      );
     }
 
-    if (!token) {
+    const user = await User.findOne({ email });
+    if (!user) {
       return NextResponse.json(
-        { userdata: null },
+        { message: "Invalid email or password" },
         { status: 401 }
       );
     }
 
-    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatch) {
+      return NextResponse.json(
+        { message: "Invalid email or password" },
+        { status: 401 }
+      );
+    }
 
-    return NextResponse.json(
-      { userdata: decoded },
+    const token = jwt.sign(
+      {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+      process.env.SECRET_KEY,
+      { expiresIn: "7d" } 
+    );
+
+    const userData = {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      token: token,
+    };
+
+    const response = NextResponse.json(
+      {
+        message: "Login successful",
+        user: userData,
+        token: token,
+      },
       { status: 200 }
     );
+
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60, 
+      path: "/",
+    });
+
+    return response;
   } catch (error) {
+    console.error("Login API Error:", error);
     return NextResponse.json(
-      { userdata: null },
-      { status: 401 } 
+      { message: "Internal server error", error: error.message },
+      { status: 500 }
     );
   }
 }
