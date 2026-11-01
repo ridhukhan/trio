@@ -22,5 +22,5 @@ password:{
 },{timestamps:true})
 
 
-const user= mongoose.models.User || mongoose.model("User",userSchema)
-export default user;
+const User= mongoose.models.User || mongoose.model("User",userSchema)
+export default User;

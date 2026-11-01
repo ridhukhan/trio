@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs"; // অথবা bcrypt
-import dbConnect from "@/lib/mongodb"; // আপনার ডাটাবেজ কানেকশন ফাইলের পাথ
-import User from "@/model/user"; // আপনার Mongoose ইউজার মডেল
+import bcrypt from "bcryptjs"; 
+import dbConnect from "@/lib/mongodb"; 
+import User from "@/model/user"; 
 
 export async function POST(req) {
   try {

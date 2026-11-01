@@ -1,6 +1,6 @@
 import { dbConnect } from "@/lib/mongodb";
 import { NextResponse } from "next/server";
-import user from "@/model/user";
+import User from "@/model/user";
 import bcrypt from "bcryptjs";
 
 export async function POST(req) {
@@ -32,7 +32,7 @@ export async function POST(req) {
 
     await dbConnect();
 
-    const existingUser = await user.findOne({
+    const existingUser = await User.findOne({
       $or: [{ email }, { username }]
     });
 
@@ -47,7 +47,7 @@ export async function POST(req) {
     }
 
     const hashedPass = await bcrypt.hash(password, 10);
-    await user.create({
+    await User.create({
       username,
       email,
       password: hashedPass,
