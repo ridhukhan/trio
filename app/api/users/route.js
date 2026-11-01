@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import connectDB from "@/lib/mongodb"; // আপনার ডাটাবেজ কানেকশন ফাইলের পাথ
-import User from "@/model/user"; // আপনার ইউজার মডেলের পাথ
+import dbConnect from "@/lib/mongodb"; 
+import User from "@/model/user"; 
 
 export async function GET() {
   try {
-    await connectDB();
+    await dbConnect();
     
     const users = await User.find({}).select("-password");
     
